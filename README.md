@@ -1,5 +1,5 @@
 # GxBoobTube.lv2
-The BoobTube is a little tube boost pedal simulation, it's a variation of the BoobTube. It adds some overdrive and tube compression along with boosting the signal
+The BoobTube is a little tube boost pedal simulation, it's a variation of the ValveCaster. It adds some overdrive and tube compression along with boosting the signal
 
 ![GxBoobTube](https://raw.githubusercontent.com/brummer10/GxBoobTube.lv2/master/GxBoobTube.png)
 
