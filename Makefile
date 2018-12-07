@@ -34,7 +34,9 @@
 	BUNDLE = $(NAME).lv2
 	VER = 0.1
 	# set compile flags
-	CXXFLAGS += -I. -I./dsp -I./plugin -fPIC -DPIC -O2 -Wall -funroll-loops -ffast-math -fomit-frame-pointer -fstrength-reduce -fdata-sections -Wl,--gc-sections $(SSE_CFLAGS)
+	CXXFLAGS += -I. -I./dsp -I./plugin -I./dsp/zita-resampler-1.1.0 -I./dsp/zita-resampler-1.1.0/zita-resampler \
+	 -fPIC -DPIC -O2 -Wall -funroll-loops -ffast-math -fomit-frame-pointer -fstrength-reduce \
+	 -fdata-sections -Wl,--gc-sections $(SSE_CFLAGS)
 	LDFLAGS += -I. -shared -lm 
 	GUI_LDFLAGS += -I./gui -shared -lm `pkg-config --cflags --libs cairo` -L/usr/X11/lib -lX11
 	# invoke build files
@@ -45,6 +47,7 @@
 	BLUE = "\033[1;34m"
 	RED =  "\033[1;31m"
 	NONE = "\033[0m"
+	ECHO = /bin/echo -e
 
 .PHONY : mod all clean install uninstall 
 
@@ -52,53 +55,61 @@ all : check $(NAME)
 	@mkdir -p ./$(BUNDLE)
 	@cp ./plugin/*.ttl ./$(BUNDLE)
 	@mv ./*.so ./$(BUNDLE)
-	@if [ -f ./$(BUNDLE)/$(NAME).so ]; then echo $(BLUE)"build finish, now run make install"; \
-	else echo $(RED)"sorry, build failed"; fi
-	@echo $(NONE)
+	@if [ -f ./$(BUNDLE)/$(NAME).so ]; then $(ECHO) $(BLUE)"build finish, now run make install"; \
+	else $(ECHO) $(RED)"sorry, build failed"; fi
+	@$(ECHO) $(NONE)
+
+debug : check $(NAME)debug
+	@mkdir -p ./$(BUNDLE)
+	@cp ./plugin/*.ttl ./$(BUNDLE)
+	@mv ./*.so ./$(BUNDLE)
+	@if [ -f ./$(BUNDLE)/$(NAME).so ]; then $(ECHO) $(BLUE)"build finish, now run make install"; \
+	else $(ECHO) $(RED)"sorry, build failed"; fi
+	@$(ECHO) $(NONE)
 
 mod : nogui
 	@mkdir -p ./$(BUNDLE)
 	@cp -R ./MOD/* ./$(BUNDLE)
 	@mv ./*.so ./$(BUNDLE)
-	@if [ -f ./$(BUNDLE)/$(NAME).so ]; then echo $(BLUE)"build finish, now run make install"; \
-	else echo $(RED)"sorry, build failed"; fi
-	@echo $(NONE)
+	@if [ -f ./$(BUNDLE)/$(NAME).so ]; then $(ECHO) $(BLUE)"build finish, now run make install"; \
+	else $(ECHO) $(RED)"sorry, build failed"; fi
+	@$(ECHO) $(NONE)
 
 check :
 ifdef ARMCPU
-	@echo $(RED)ARM CPU DEDECTED, please check the optimization flags
-	@echo $(NONE)
+	@$(ECHO) $(RED)ARM CPU DEDECTED, please check the optimization flags
+	@$(ECHO) $(NONE)
 endif
 
    #@build resource object files
 $(RES_OBJECTS) : gui/pedal.png gui/pswitch.png 
-	@echo $(LGREEN)"generate resource files,"$(NONE)
+	@$(ECHO) $(LGREEN)"generate resource files,"$(NONE)
 	-@cd ./gui && ld -r -b binary pedal.png -o pedal.o
 	-@cd ./gui && ld -r -b binary pswitch.png -o pswitch.o
 
 clean :
 	@rm -f $(NAME).so
 	@rm -rf ./$(BUNDLE)
-	@echo ". ." $(BLUE)", clean up"$(NONE)
+	@$(ECHO) ". ." $(BLUE)", clean up"$(NONE)
 
 dist-clean :
 	@rm -f $(NAME).so
 	@rm -rf ./$(BUNDLE)
 	@rm -rf ./$(RES_OBJECTS)
-	@echo ". ." $(BLUE)", clean up"$(NONE)
+	@$(ECHO) ". ." $(BLUE)", clean up"$(NONE)
 
 install :
 ifneq ("$(wildcard ./$(BUNDLE))","")
 	@mkdir -p $(DESTDIR)$(INSTALL_DIR)/$(BUNDLE)
 	cp -r ./$(BUNDLE)/* $(DESTDIR)$(INSTALL_DIR)/$(BUNDLE)
-	@echo ". ." $(BLUE)", done"$(NONE)
+	@$(ECHO) ". ." $(BLUE)", done"$(NONE)
 else
-	@echo ". ." $(BLUE)", you must build first"$(NONE)
+	@$(ECHO) ". ." $(BLUE)", you must build first"$(NONE)
 endif
 
 uninstall :
 	@rm -rf $(INSTALL_DIR)/$(BUNDLE)
-	@echo ". ." $(BLUE)", done"$(NONE)
+	@$(ECHO) ". ." $(BLUE)", done"$(NONE)
 
 $(NAME) : clean $(RES_OBJECTS)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LDFLAGS) -o $(NAME).so
