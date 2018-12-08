@@ -340,8 +340,8 @@ void Gx_boobtube_::run_dsp_(uint32_t n_samples)
     }
   }
   if (!bypassed) {
-    if(!v60_) boobtube->mono_audio(static_cast<int>(n_samples), buf, buf, boobtube);
-    else boobtube60->mono_audio(static_cast<int>(n_samples), buf, buf, boobtube60);
+    if(!v60_) boobtube->mono_audio(static_cast<int>(ReCount), buf, buf, boobtube);
+    else boobtube60->mono_audio(static_cast<int>(ReCount), buf, buf, boobtube60);
   }
   if (fact>1) {
     smp.up(ReCount, buf, output);
