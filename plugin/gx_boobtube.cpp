@@ -192,7 +192,7 @@ Gx_boobtube_::Gx_boobtube_() :
   boobtube(boobtube::plugin()),
   boobtube60(boobtube60::plugin()),
   bypass(0),
-  bypass_(0),
+  bypass_(2),
   v60(0),
   v60_(0),
   needs_ramp_down(false),
