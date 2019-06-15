@@ -8,7 +8,7 @@ The BoobTube is a little tube boost pedal simulation, it's a variation of the Va
 |   Command       |     |   Action                      |
 |-----------------|:---:|-------------------------------|
 |TAB              |==   |make next controller active    |
-|SHIFT+TAB        |==   |make previus controller active |
+|SHIFT+TAB        |==   |make previous controller active |
 |UP or RIGHT      |==   |increase controller value      |
 |DOWN or LEFT     |==   |decrease controller value      |
 |HOME (pos1)      |==   |set min controller value       |
