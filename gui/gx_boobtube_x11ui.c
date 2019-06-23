@@ -281,6 +281,16 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 					|EnterWindowMask|LeaveWindowMask|ButtonReleaseMask
 					|ButtonPressMask|Button1MotionMask;
 
+	XSizeHints* win_size_hints;
+	win_size_hints = XAllocSizeHints();
+	win_size_hints->flags = PSize | PMinSize;
+	win_size_hints->min_width = ui->width/1.4;
+	win_size_hints->min_height = ui->height/1.4;
+	win_size_hints->base_width = ui->width;
+	win_size_hints->base_height = ui->height;
+	XSetWMNormalHints(ui->dpy, ui->win, win_size_hints);
+	XFree(win_size_hints);
+
 	XSelectInput(ui->dpy, ui->win, ui->event_mask);
 	XMapWindow(ui->dpy, ui->win);
 	XClearWindow(ui->dpy, ui->win);
