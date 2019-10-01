@@ -184,6 +184,7 @@ typedef struct {
 	cairo_t *cr;
 
 	gx_controller controls[CONTROLS];
+	int block_event;
 	double start_value;
 	gx_scale rescale;
 
@@ -265,6 +266,7 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 	ui->controls[2] = (gx_controller) {{0.5, 0.5, 0.0, 1.0, 0.01}, {470, 70, 81, 81}, false,"TONE", KNOB, TONE};
 	ui->controls[3] = (gx_controller) {{0.15, 0.15, 0.0, 1, 0.01}, {590, 70, 81, 81}, false,"VOLUME", KNOB, VOLUME};
 	ui->controls[4] = (gx_controller) {{0.0, 0.0, 0.0, 1, 1.0}, {680, 70, 81, 81}, false,"VOLTAGE", SWITCH, VOLTAGE};
+	ui->block_event = -1;
 	ui->start_value = 0.0;
 
 	ui->pedal = cairo_image_surface_create_from_stream(ui, LDVAR(pedal_png));
@@ -681,9 +683,11 @@ static void send_controller_event(gx_boobtubeUI *ui, int controller) {
 static void check_value_changed(gx_boobtubeUI *ui, int i, float* value) {
 	if(fabs(*(value) - ui->controls[i].adj.value)>=0.00001) {
 		ui->controls[i].adj.value = *(value);
-		ui->write_function(ui->controller,ui->controls[i].port,sizeof(float),0,value);
+		if (ui->block_event != ui->controls[i].port)
+			ui->write_function(ui->controller,ui->controls[i].port,sizeof(float),0,value);
 		debug_print("send_controller_event for %i value %f\n",i,*(value));
 		send_controller_event(ui, i);
+		ui->block_event = -1;
 		// special case, redraw grid when voltage switched
 		if (i == 4) send_controller_event(ui, 0);
 	}
@@ -1056,6 +1060,7 @@ static void port_event(LV2UI_Handle handle, uint32_t port_index,
 	float value = *(float*)buffer;
 	for (int i=0;i<CONTROLS;i++) {
 		if (port_index == ui->controls[i].port) {
+			ui->block_event = (int)port_index;
 			check_value_changed(ui, i, &value);
 		}
 	}
